@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 
 class HistoricoController extends Controller
@@ -11,6 +12,20 @@ class HistoricoController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('frete.Historico');
+
+        $telefone = $request->input('telefone', '');
+
+        $cliente = Cliente::where('telefone', $telefone)
+            ->with('enviados', 'recebidos')
+            ->first();
+
+        if (! $cliente) {
+            return redirect()->back()->with('error', 'Cliente não encontrado');
+        }
+
+
+        return view('frete.Historico', [
+            'cliente' => $cliente
+        ]);
     }
 }
